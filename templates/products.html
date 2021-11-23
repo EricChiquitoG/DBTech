@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>e-commerce home site</title>
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+
+
+<div id="product-grid">
+    <div class="txt-heading">Products</div>
+
+    {% for product in products %}
+
+        <div class="product-item">
+            <form method="post" action="/add">
+                <div class="product-image"><img src= {{ product[4] }} class="product-image2"></div>
+                <div class="product-tile-footer">
+                    <div class="product-title">{{ product[1] }}</div>
+                    <div class="product-price">{{ product[5] }} SEK</div>
+                    <div class="cart-action">
+                        <input type="text" class="product-quantity" name="quantity" value="1" size="2" />
+                        <input type="submit" value="Add to Cart" class="btnAddAction" />
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    {% endfor %}
+    <a href="{{url_for('home')}}">Start page</a>
+</div>
+</body>
+</html>

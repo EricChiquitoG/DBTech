@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+Edit product
+
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Editar juego</h3>
+            <form action="{{url_for('update',id=article[0])}}" method="post">
+                <input type="hidden" name="id" value="{{article[0]}}">
+                <label for="stock">Stock:</label>
+                <input value="{{article[3]}}" required type="number" class="input" placeholder="stock" name="stock" id="stock">
+                <label for="image_url">Url:</label>
+                <input value="{{article[4]}}" required type="text" class="input" placeholder="image_url" name="image_url" id="image_url">
+                <label for="price">Price:</label>
+                <input value="{{article[5]}}" required type="number" class="input" placeholder="price" name="price" id="price">
+                <input type="submit" value="Submit">
+                <a href="{{url_for('add')}}">Start page</a>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

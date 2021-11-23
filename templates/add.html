@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+New article
+
+
+<section class="section">
+    <div class="columns">
+        <div class="column is-one-third">
+            <h3 class="is-size-3">Agregar juego</h3>
+            <form action="{{url_for('save')}}" method="post">
+                <label for="id">id:</label>
+                <input required type="number" class="input" placeholder="id" name="id" id="id">
+                <label for="name">name:</label>
+                <input required type="text" class="input" placeholder="name" name="name" id="name">
+                <label for="category">Category:</label>
+                <input required type="text" class="input" placeholder="category" name="category" id="category">
+                <label for="stock">stock:</label>
+                <input required type="number" class="input" placeholder="stock" name="stock" id="stock">
+                <label for="url">url:</label>
+                <input required type="text" class="input" placeholder="url" name="url" id="url">
+                <label for="price">price:</label>
+                <input required type="number" class="input" placeholder="price" name="price" id="price">
+
+                <input type="submit" value="Submit">
+                <a href="{{url_for('add')}}">Start page</a>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

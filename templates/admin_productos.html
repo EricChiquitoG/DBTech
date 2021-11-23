@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Products admin view</h3>
+            <a href="{{url_for('add_art')}}">Add article</a>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>article_id</th>
+                        <th>article_name</th>
+                        <th>category</th>
+                        <th>stock</th>
+                        <th>image_url</th>
+                        <th>price</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                    <tr>
+                        <td>{{article[0]}}</td>
+                        <td>{{article[1]}}</td>
+                        <td>{{article[2]}}</td>
+                        <td>{{article[3]}}</td>
+                        <td>{{article[4]}}</td>
+                        <td>{{article[5]}}</td>
+                        <td>
+                            <a href="{{url_for('edit', id=article[0])}}">Edit</a>
+                        </td>
+                        <td>
+                            <form action="{{url_for('erase')}}" method="POST">
+                                <input type="hidden" name="id" value="{{article[0]}}">
+                                <button>Delete</button></a>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{url_for('home')}}">Start page</a>
+        </div>
+    </div>
+</section>
+</html>
