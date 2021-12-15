@@ -7,25 +7,74 @@
 <body>
 
 
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Product Cart</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>image</th>
+                        <th>article name</th>
+                        <th>quantity</th>
+                        <th>total</th>
+                        <th>Purchase</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cart in carts %}
+                    <tr>
+                        <td><img src={{ cart[1] }} width="20"></td>
+                        <td>{{cart[0]}}</td>
+                        <td>{{cart[2]}}</td>
+                        <td>{{cart[3]}}</td>
+                        <td>
+                            <a href="{{url_for('pur', id=cart[4])}}">Purchase</a>
+                        </td>
+                        <td>
+                            <a href="{{url_for('empty', id=cart[4])}}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div class = "orders">
+    <button onclick="window.location.href='http://localhost:5000/myorders';">
+        My orders
+    </button>
+</div>
+
+
 
 <div id="product-grid">
     <div class="txt-heading">Products</div>
 
-    {% for product in products %}
+    {% for article in articles %}
 
         <div class="product-item">
-            <form method="post" action="/add">
-                <div class="product-image"><img src= {{ product[4] }} class="product-image2"></div>
+            <form action="/add_to_cart" method="post"  onsubmit="myFunction()" >
+                <div class="product-image"><img src= {{ article[4] }} class="product-image2"></div>
                 <div class="product-tile-footer">
-                    <div class="product-title">{{ product[1] }}</div>
-                    <div class="product-price">{{ product[5] }} SEK</div>
+                    <div class="product-title">{{ article[1] }}</div>
+                    <div class="product-price">{{ article[5] }} SEK</div>
                     <div class="cart-action">
+                        <input type="hidden" name="product-id" value="{{article[0]}}">
                         <input type="text" class="product-quantity" name="quantity" value="1" size="2" />
                         <input type="submit" value="Add to Cart" class="btnAddAction" />
                     </div>
                 </div>
             </form>
         </div>
+        <script>
+            function myFunction() {
+              alert("Product added to cart");
+            }
+        </script>
 
     {% endfor %}
     <a href="{{url_for('home')}}">Start page</a>

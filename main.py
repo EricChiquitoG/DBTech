@@ -8,10 +8,11 @@ from flask import flash, session, render_template, request, redirect, url_for
 from werkzeug.security import generate_password_hash
 import uuid
 import hashlib
+from pymongo.errors import DuplicateKeyError
 from user import User
 
 
-from db import fetch_user, get_article, get_stock ,is_admin, edit_product, is_customer, new_art
+from db import get_shipping,order_items,cart_to_order, remove_cart,cart_items, fetch_user, get_article, get_cart, get_stock ,is_admin, edit_product, is_customer, new_art, save_user_tokyo_drift,add_to_cart
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
@@ -38,6 +39,30 @@ def login():
             message = 'Failed to login!'
     return render_template('login.html', message=message)
 
+@app.route("/signup", methods=['GET','POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    message = ''
+    if request.method=='POST':
+        username=request.form.get('username')
+        first_name=request.form.get('first_name')
+        last_name=request.form.get('last_name')
+        email=request.form.get('email')
+        password=request.form.get('password')
+        stname=request.form.get('stname')
+        st_number=request.form.get('st_number')
+        postal_code=request.form.get('postal_code')
+        state=request.form.get('state')
+        country=request.form.get('country')
+        try:
+            save_user_tokyo_drift(username,first_name,last_name,email, password, stname,st_number,postal_code, state, country)
+            return redirect(url_for('login'))
+        except DuplicateKeyError:
+            message = "User already exists!"
+    return render_template('signup.html', message=message)
+
 @app.route("/logout")
 @login_required
 def logout():
@@ -51,7 +76,8 @@ def products():
     if is_customer(current_user.username):
         try: 
             prod=get_stock()
-            return render_template('products.html',products=prod)
+            cart=cart_items(current_user.username)
+            return render_template('products.html',articles=prod, carts=cart)
         except Exception as e:
             print (e)
     else: return("this view is only available for customers",404)
@@ -127,6 +153,47 @@ def erase():
         return render_template('admin_productos.html', articles=get_stock())
     else:
         return "User is not admin", 404
+
+@app.route('/add_to_cart', methods=["POST"])
+@login_required
+def add_prod_to_cart():
+    prod_id= request.form["product-id"]
+    prod_quant=request.form["quantity"]
+    print(prod_quant,current_user.username,prod_id)
+    add_to_cart(prod_quant,current_user.username,prod_id)
+    prod=get_stock()
+    cart=cart_items(current_user.username)
+    return render_template('products.html',articles=prod, carts= cart)
+    
+@app.route('/purchase/<int:id>')
+@login_required
+def pur(id):
+        print(id)
+        
+        cart_to_order(id)
+        prod=get_stock()
+        cart=cart_items(current_user.username)
+        return render_template('products.html',articles=prod, carts= cart)
+
+@app.route('/empty/<int:id>')
+@login_required
+def empty(id):
+        prod=get_stock()
+        cart=cart_items(current_user.username)
+        remove_cart(id)
+        return render_template('products.html',articles=prod, carts= cart)
+
+@app.route('/myorders')
+@login_required
+def myorders():
+    user=current_user.username
+    items_cust=order_items(user)
+    return render_template('orders_customer.html',items=items_cust)
+
+@app.route('/myorders/details')
+@login_required
+def details():
+    return 'ok'
 
 @login_manager.user_loader
 def load_user(username):

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>e-commerce home site</title>
+
+</head>
+<section>
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">My Orders</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>image</th>
+                        <th>article name</th>
+                        <th>quantity</th>
+                        <th>total</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{item[0]}}</td>
+                        <td><img src={{ item[2] }} width="20"></td>
+                        <td>{{item[1]}}</td>
+                        <td>{{item[3]}}</td>
+                        <td>{{item[4]}}</td>
+                        <td>
+                            <a href="{{url_for('details', id=item[0])}}">Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+</html>
