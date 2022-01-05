@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <section>
+        <div class="columns">
+            <div class="column">
+                <h3 class="is-size-3">Product reviews for {{id}}</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>user_id</th>
+                            <th>grade</th>
+                            <th>review</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <td>{{review[0]}}</td>
+                            <td>{{review[2]}}</td>
+                            <td>{{review[3]}}</td>
+                            <td>{{review[4]}}</td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+    </section>

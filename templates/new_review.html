@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+New Review
+
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Review for {{ id }}</h3>
+            <form action="{{url_for('new_review_submit',id=id)}}" method="post">
+                <label>Rate:</label>
+                <input type="number" name="grade">
+                <label>Comment:</label>
+                <input type="text" name="comment">
+                <input type="submit" value="Submit">
+                <a href="{{url_for('myorders')}}">Back to my orders</a>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

@@ -16,7 +16,6 @@
                         <th>article name</th>
                         <th>quantity</th>
                         <th>total</th>
-                        <th>Details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,8 +26,42 @@
                         <td>{{item[1]}}</td>
                         <td>{{item[3]}}</td>
                         <td>{{item[4]}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<section>
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">My finished Orders</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>image</th>
+                        <th>article name</th>
+                        <th>article id</th>
+                        <th>quantity</th>
+                        <th>total</th>
+                        <th>Review</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for release in released %}
+                    <tr>
+                        <td>{{release[0]}}</td>
+                        <td><img src={{ release[2] }} width="20"></td>
+                        <td>{{release[1]}}</td>
+                        <td>{{release[5]}}</td>
+                        <td>{{release[3]}}</td>
+                        <td>{{release[4]}}</td>
                         <td>
-                            <a href="{{url_for('details', id=item[0])}}">Details</a>
+                            <a href="{{url_for('new_review', id=release[5])}}">Review</a>
                         </td>
                     </tr>
                     {% endfor %}

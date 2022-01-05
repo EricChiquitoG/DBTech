@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Orders Admin View</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>order_id</th>
+                        <th>user_id</th>
+                        <th>date</th>
+                        <th>email</th>
+                        <th>stname</th>
+                        <th>st_number</th>
+                        <th>postal_code</th>
+                        <th>state</th>
+                        <th>country</th>
+                        <th>status</th>
+                        <th>Items</th>
+                        <th>Release</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{order[0]}}</td>
+                        <td>{{order[1]}}</td>
+                        <td>{{order[2]}}</td>
+                        <td>{{order[3]}}</td>
+                        <td>{{order[4]}}</td>
+                        <td>{{order[5]}}</td>
+                        <td>{{order[6]}}</td>
+                        <td>{{order[7]}}</td>
+                        <td>{{order[8]}}</td>
+                        <td>{{order[9]}}</td>
+                        <td>
+                            <a href="{{url_for('admin_itemsio', id=order[0])}}">Items</a>
+                        </td>
+                        <td>
+                            <a href="{{url_for('release_recollection', id=order[0])}}">Release</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{url_for('home')}}">Start page</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Finished Orders Admin View</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>order_id</th>
+                        <th>user_id</th>
+                        <th>date</th>
+                        <th>email</th>
+                        <th>stname</th>
+                        <th>st_number</th>
+                        <th>postal_code</th>
+                        <th>state</th>
+                        <th>country</th>
+                        <th>status</th>
+                        <th>Items</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for release in releases %}
+                    <tr>
+                        <td>{{release[0]}}</td>
+                        <td>{{release[1]}}</td>
+                        <td>{{release[2]}}</td>
+                        <td>{{release[3]}}</td>
+                        <td>{{release[4]}}</td>
+                        <td>{{release[5]}}</td>
+                        <td>{{release[6]}}</td>
+                        <td>{{release[7]}}</td>
+                        <td>{{release[8]}}</td>
+                        <td>{{release[9]}}</td>
+                        <td>
+                            <a href="{{url_for('admin_itemsio', id=release[0])}}">Items</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</html>

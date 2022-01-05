@@ -121,7 +121,7 @@ def get_order(user_id):
     cursor = conn.cursor()
     cursor.execute(
             "SELECT order_id FROM Orders WHERE user_id = %s", (user_id))
-    cart = cursor.fetchone()
+    cart = cursor.fetchall()
     conn.close()
     return cart
 
@@ -132,7 +132,7 @@ def cart_items(user_id):
         cart='1'
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("select n.article_name, n.image_url, n.quantity, n.total, n.cart_id from (SELECT c.cart_id, a.article_name, a.image_url, c.quantity, a.price*c.quantity as total     FROM cart_items c join articles a on a.article_id = c.article_id) n where n.cart_id = %s",(cart))
+    cursor.execute("select n.article_name, n.image_url, n.quantity, n.total, n.cart_id, n.article_id from (SELECT c.cart_id, a.article_name, a.image_url, c.quantity, a.price*c.quantity as total, a.article_id    FROM cart_items c join articles a on a.article_id = c.article_id) n where n.cart_id = %s",(cart))
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -140,12 +140,29 @@ def cart_items(user_id):
 
 def order_items(user_id):
     user=get_uid(user_id)
-    cart=get_order(user)
+    carts=get_order(user)
+    cart = tuple([item[0] for item in carts])
+    print(cart)
     if cart == None:
         cart='1'
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("select n.order_id, n.article_name, n.image_url, n.quantity, n.total  from (SELECT c.order_id, a.article_name, a.image_url, c.quantity, a.price*c.quantity as total     FROM order_items c join articles a on a.article_id = c.article_id) n where n.order_id = %s",(cart))
+    cursor.execute("select n.order_id, n.article_name, n.image_url, n.quantity, n.total  from (SELECT c.order_id, a.article_name, a.image_url, c.quantity, a.price*c.quantity as total     FROM order_items c join articles a on a.article_id = c.article_id) n where n.order_id in {} and n.order_id in (select order_id from Orders where status = 'submitted') ".format(cart))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return(rows)
+
+def cus_released(user_id):
+    user=get_uid(user_id)
+    carts=get_order(user)
+    cart = tuple([item[0] for item in carts])
+    print(cart)
+    if cart == None:
+        cart='1'
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("select n.order_id, n.article_name, n.image_url, n.quantity, n.total, n.article_id  from (SELECT c.order_id, a.article_name, c.article_id, a.image_url, c.quantity, a.price*c.quantity as total    FROM order_items c join articles a on a.article_id = c.article_id) n where n.order_id in {} and n.order_id in (select order_id from Orders where status = 'released') ".format(cart))
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -193,7 +210,14 @@ def add_item_cart(cart_id,art_id,uid,quantity):
     conn.commit()
     conn.close()
 
-
+def get_single_order(order_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("SELECT * FROM Orders WHERE order_id = %s", (order_id))
+    rows = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return rows
 
 def add_to_cart(quantity, username,art_id):
     
@@ -212,15 +236,34 @@ def add_to_cart(quantity, username,art_id):
     add_item_cart(cart,art_id,user,quantity)
     # At this point we know the ID of the cart to which the product will be added.
 
+def stock_deduct(order_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("SELECT article_id, quantity FROM order_items WHERE order_id = %s", (order_id))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    for i in rows:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE articles SET stock = stock-%s WHERE article_id = %s",
+                        (int(i[1]),i[0]))
+        conn.commit()
+        conn.close()
+
 def cart_to_order(cart_id):
     conn = mysql.connect()
     cursor = conn.cursor()
     cursor.execute("insert into Orders (order_id, user_id, date, email,stname, st_number, postal_code, state, country, status) select cart_id, user_id, %s,  email, stname, st_number, postal_code, state, country, %s  from Cart where cart_id = %s",(datetime.now(), 'submitted', cart_id))
     cursor.execute("Insert into order_items select * from cart_items where cart_id=%s", (cart_id))
+
+ 
     conn.commit()   
-    
     cursor.close()
     conn.close()
+       ## Script to reduce stock by the ammount of the purchase
+    stock_deduct(cart_id)
+    
     remove_cart(cart_id)
 
 def remove_cart(cart_id):
@@ -232,6 +275,89 @@ def remove_cart(cart_id):
     conn.commit()
     cursor.close()
     conn.close()
+
+def remove_item_cart(cart_id, art_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("delete from cart_items where cart_id=%s and article_id=%s", (cart_id, art_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def ongoing():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("select * from Orders where status = 'submitted'")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+def released():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("select * from Orders where status = 'released'")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+def items_admin(id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("select n.order_id, n.article_name, n.image_url, n.quantity, n.total  from (SELECT c.order_id, a.article_name, a.image_url, c.quantity, a.price*c.quantity as total     FROM order_items c join articles a on a.article_id = c.article_id) n where n.order_id = {}".format(id))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+def release(id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Orders SET status = 'released' WHERE order_id = %s",
+                       (id))
+    conn.commit()
+    conn.close()
+
+def new_review2(uid, article_id, rate, comment):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    user_id=get_uid(uid)
+    cursor.execute("INSERT into reviews2 (id, article_id, user_id, grade, review) VALUES (%s,%s,%s,%s,%s)",(random.randint(100,9999),article_id,user_id,rate,comment))
+    conn.commit()   
+    cursor.close()
+    conn.close()
+    calulate_grade(article_id,rate)
+
+def score_exist(article_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("select avg_rate from articles where article_id = %s",(article_id))
+    rows = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return rows
+
+def calulate_grade(article_id, score):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    if score_exist(article_id)==None:
+        cursor.execute("UPDATE articles SET avg_rate = %s WHERE article_id = %s",
+                       (score, article_id))
+    else:
+        cursor.execute("update articles a join (select article_id, avg(grade) as avg_rate from reviews2 r group by article_id) r on a.article_id = r.article_id set a.avg_rate = r.avg_rate")
+    conn.commit()
+    conn.close()
+
+def get_reviews(article_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute ("select * from reviews2 where article_id = %s",(article_id))
+    rows = cursor.fetchall()
+    print(rows)
+    cursor.close()
+    conn.close()
+    return rows
 
 #add_to_cart(2,1465,47001)
 #print(get_uid('ericc'))

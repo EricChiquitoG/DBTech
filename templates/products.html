@@ -19,7 +19,8 @@
                         <th>quantity</th>
                         <th>total</th>
                         <th>Purchase</th>
-                        <th>Delete</th>
+                        <th>Delete all</th>
+                        <th>Delete one</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,6 +35,10 @@
                         </td>
                         <td>
                             <a href="{{url_for('empty', id=cart[4])}}">Delete</a>
+                        </td>
+                        <td>
+                            <a href="{{url_for('removeitemcart', cart_id=cart[4], item_id=cart[5])}}">Delete</a>
+                            
                         </td>
                     </tr>
                     {% endfor %}
@@ -67,6 +72,10 @@
                         <input type="text" class="product-quantity" name="quantity" value="1" size="2" />
                         <input type="submit" value="Add to Cart" class="btnAddAction" />
                     </div>
+                    <div class="average">Average Score: {{ article[6] }}</div>
+                    <td>
+                        <a href="{{url_for('all_reviews', id=article[0])}}">See reviews</a>
+                    </td>
                 </div>
             </form>
         </div>

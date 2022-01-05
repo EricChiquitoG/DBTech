@@ -12,7 +12,7 @@ from pymongo.errors import DuplicateKeyError
 from user import User
 
 
-from db import get_shipping,order_items,cart_to_order, remove_cart,cart_items, fetch_user, get_article, get_cart, get_stock ,is_admin, edit_product, is_customer, new_art, save_user_tokyo_drift,add_to_cart
+from db import get_reviews, get_single_order,cus_released, new_review2,released,release,items_admin,ongoing,remove_item_cart,get_shipping,order_items,cart_to_order, remove_cart,cart_items, fetch_user, get_article, get_cart, get_stock ,is_admin, edit_product, is_customer, new_art, save_user_tokyo_drift,add_to_cart
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
@@ -188,12 +188,59 @@ def empty(id):
 def myorders():
     user=current_user.username
     items_cust=order_items(user)
-    return render_template('orders_customer.html',items=items_cust)
+    released_articles=cus_released(user)
+    return render_template('orders_customer.html',items=items_cust, released=released_articles)
 
-@app.route('/myorders/details')
+@app.route('/products/remove_item/<int:cart_id>/<int:item_id>')
 @login_required
-def details():
-    return 'ok'
+def removeitemcart(cart_id, item_id):
+    remove_item_cart(cart_id,item_id)
+    prod=get_stock()
+    cart=cart_items(current_user.username)
+    return render_template('products.html',articles=prod, carts= cart)
+
+@app.route('/add/orders')
+@login_required
+def admin_orders():
+    orders=ongoing()
+    return render_template('orders_admin.html',orders=orders)
+
+@app.route('/add/orders/<int:id>')
+@login_required
+def admin_itemsio(id):
+    items=items_admin(id)
+    return render_template('items_order.html',items=items)
+
+@app.route('/add/orders/<int:id>/release')
+@login_required
+def release_recollection(id):
+    release(id)
+    orders=ongoing()
+    releases=released()
+    return render_template('orders_admin.html',orders=orders,releases=releases)
+
+@app.route('/myorders/<int:id>')
+@login_required
+def new_review(id):
+    return render_template('new_review.html',id=id)
+
+@app.route('/myorders/<int:id>/review',methods=["POST"])
+@login_required
+def new_review_submit(id):
+    user= current_user.username
+    comment = request.form["comment"]
+    grade = request.form["grade"]
+    new_review2(user, id, grade, comment)
+    items_cust=order_items(user)
+    released_articles=cus_released(user)
+    return render_template('orders_customer.html',items=items_cust, released=released_articles)
+
+@app.route('/products/<int:id>/reviews')
+@login_required
+def all_reviews(id):
+    reviews=get_reviews(id)
+    return render_template('all_reviews.html',reviews=reviews,id=id)
+
 
 @login_manager.user_loader
 def load_user(username):
